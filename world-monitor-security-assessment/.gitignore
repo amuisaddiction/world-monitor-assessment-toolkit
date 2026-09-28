@@ -1,0 +1,5 @@
+.env
+__pycache__/
+*.pyc
+target/worldmonitor/
+node_modules/

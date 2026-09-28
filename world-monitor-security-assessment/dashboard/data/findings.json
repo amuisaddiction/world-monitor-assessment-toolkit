@@ -1,0 +1,20 @@
+{
+  "scan_id": "sample-scan-0001",
+  "target": "http://localhost:3000",
+  "timestamp": "2026-09-28T00:00:00Z",
+  "findings": [
+    {
+      "id": "AUTH-002",
+      "title": "Session cookie missing security flags",
+      "category": "auth",
+      "severity": "medium",
+      "cvss_score": 5.9,
+      "affected_component": "http://localhost:3000 (Set-Cookie header)",
+      "description": "Sample placeholder finding — replace with real scanner output.",
+      "reproduction_steps": ["Run scanner/main.py against your local target"],
+      "evidence": "",
+      "remediation": "Set HttpOnly, Secure, SameSite on session cookies.",
+      "status": "open"
+    }
+  ]
+}

@@ -2,8 +2,10 @@ import streamlit as st
 import requests
 import json
 import time
+import os
 
-API_URL = "http://127.0.0.1:8000"
+API_URL = os.getenv("API_BASE_URL", "http://127.0.0.1:8000")
+DEFAULT_TARGET = os.getenv("TARGET_URL", "http://127.0.0.1:8080")
 
 st.set_page_config(page_title="World Monitor SOC", page_icon="🛡️", layout="wide")
 
@@ -38,13 +40,13 @@ if menu == "Overview":
 
 elif menu == "New Assessment":
     st.header("New Assessment")
-    target = st.text_input("Authorized Target", "http://127.0.0.1:8080")
+    target = st.text_input("Authorized Target", DEFAULT_TARGET)
     if st.button("START SECURITY ASSESSMENT"):
         try:
             res = requests.post(f"{API_URL}/api/scans", json={"target_url": target})
             if res.status_code == 200:
                 st.success("Scan started successfully! Please wait...")
-                time.sleep(3) # simulate progress wait
+                time.sleep(3)
                 st.info("Scan completed. Check Overview or Findings.")
             else:
                 st.error(res.json().get("detail", "Error"))
@@ -75,8 +77,9 @@ elif menu == "Reports":
         if scan_id and st.button("Generate AI Report"):
             res = requests.post(f"{API_URL}/api/reports/{scan_id}")
             if res.status_code == 200:
-                st.success("Report generated!")
-                st.write(f"Saved to: {res.json()['file_path']}")
+                st.success("Reports generated successfully!")
+                st.write(f"Assessment Report: {res.json()['file_path']}")
+                st.write(f"CERT-In Mapping: {res.json()['cert_path']}")
     except Exception:
         st.error("API Server Offline")
 

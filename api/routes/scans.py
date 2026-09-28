@@ -11,12 +11,13 @@ from scanner.client_security import analyze_client_security
 from engine.risk_engine import assess_finding
 from engine.correlation import deduplicate_findings
 import logging
+import os
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
 
 def validate_target(target: str):
-    allowed = ["http://127.0.0.1", "http://localhost"]
+    allowed = ["http://127.0.0.1", "http://localhost", "http://test-target"]
     if not any(target.startswith(a) for a in allowed):
         raise HTTPException(status_code=400, detail="Target not authorized. Local/Staging only.")
 

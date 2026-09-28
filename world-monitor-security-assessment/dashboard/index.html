@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>World Monitor — Security Findings Dashboard</title>
+<style>
+  :root {
+    --critical: #dc2626; --high: #ea580c; --medium: #ca8a04;
+    --low: #2563eb; --info: #6b7280;
+    --bg: #0f172a; --card: #1e293b; --text: #e2e8f0; --muted: #94a3b8;
+  }
+  * { box-sizing: border-box; }
+  body { margin:0; font-family: -apple-system, Segoe UI, Roboto, sans-serif;
+         background: var(--bg); color: var(--text); padding: 32px; }
+  h1 { font-size: 22px; margin-bottom: 4px; }
+  .meta { color: var(--muted); font-size: 13px; margin-bottom: 24px; }
+  .grid { display:grid; grid-template-columns: repeat(auto-fit,minmax(220px,1fr));
+          gap: 16px; margin-bottom: 32px; }
+  .stat { background: var(--card); border-radius: 10px; padding: 16px; }
+  .stat .num { font-size: 28px; font-weight: 700; }
+  .stat .label { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: .04em; }
+  table { width:100%; border-collapse: collapse; background: var(--card); border-radius: 10px; overflow:hidden; }
+  th, td { text-align:left; padding: 10px 14px; font-size: 13px; border-bottom: 1px solid #334155; }
+  th { color: var(--muted); font-weight: 600; text-transform: uppercase; font-size: 11px; }
+  .badge { display:inline-block; padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight:600; color:#fff; }
+  #empty { color: var(--muted); padding: 24px; text-align:center; }
+</style>
+</head>
+<body>
+  <h1>World Monitor — Security Findings Dashboard</h1>
+  <div class="meta" id="meta">Loading findings.json…</div>
+
+  <div class="grid" id="stats"></div>
+  <table id="table" style="display:none">
+    <thead>
+      <tr><th>ID</th><th>Title</th><th>Category</th><th>Severity</th><th>CVSS</th><th>Component</th></tr>
+    </thead>
+    <tbody id="tbody"></tbody>
+  </table>
+  <div id="empty" style="display:none">No findings loaded — run the scanner first.</div>
+
+<script>
+const SEVERITY_ORDER = ["critical","high","medium","low","info"];
+const SEVERITY_COLOR = {critical:"var(--critical)", high:"var(--high)", medium:"var(--medium)", low:"var(--low)", info:"var(--info)"};
+
+fetch("data/findings.json")
+  .then(r => r.json())
+  .then(render)
+  .catch(() => {
+    document.getElementById("meta").textContent = "Could not load data/findings.json";
+    document.getElementById("empty").style.display = "block";
+  });
+
+function render(data) {
+  const findings = data.findings || [];
+  document.getElementById("meta").textContent =
+    `Target: ${data.target || "n/a"} · Scan: ${data.scan_id || "n/a"} · ${findings.length} finding(s)`;
+
+  if (findings.length === 0) {
+    document.getElementById("empty").style.display = "block";
+    return;
+  }
+
+  const counts = Object.fromEntries(SEVERITY_ORDER.map(s => [s, 0]));
+  findings.forEach(f => { counts[f.severity] = (counts[f.severity] || 0) + 1; });
+
+  const statsEl = document.getElementById("stats");
+  SEVERITY_ORDER.forEach(sev => {
+    const div = document.createElement("div");
+    div.className = "stat";
+    div.innerHTML = `<div class="num" style="color:${SEVERITY_COLOR[sev]}">${counts[sev]}</div>
+                      <div class="label">${sev}</div>`;
+    statsEl.appendChild(div);
+  });
+
+  const tbody = document.getElementById("tbody");
+  findings
+    .slice()
+    .sort((a,b) => SEVERITY_ORDER.indexOf(a.severity) - SEVERITY_ORDER.indexOf(b.severity))
+    .forEach(f => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${f.id}</td>
+        <td>${f.title}</td>
+        <td>${f.category}</td>
+        <td><span class="badge" style="background:${SEVERITY_COLOR[f.severity]}">${f.severity}</span></td>
+        <td>${f.cvss_score}</td>
+        <td>${f.affected_component}</td>`;
+      tbody.appendChild(tr);
+    });
+  document.getElementById("table").style.display = "table";
+}
+</script>
+</body>
+</html>

@@ -1,6 +1,6 @@
 from pydantic import BaseModel, Field
 from typing import List, Optional, Dict, Any
-from datetime import datetime
+from datetime import datetime, timezone
 import uuid
 
 class Evidence(BaseModel):
@@ -22,4 +22,4 @@ class Finding(BaseModel):
     root_cause: str
     remediation: str
     status: str = "Open"
-    timestamp: str = Field(default_factory=lambda: datetime.utcnow().isoformat())
+    timestamp: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())

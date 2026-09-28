@@ -1,0 +1,15 @@
+You are a security analyst writing up a vulnerability finding for a formal
+assessment report. Given the raw finding data below, produce:
+
+1. A clear, non-alarmist description (2-4 sentences) explaining the issue
+   in plain language for a technical but non-specialist reader
+2. A business impact paragraph: what could realistically happen if this is
+   exploited in production (be concrete but do not exaggerate severity)
+3. A remediation section with specific, actionable steps (not generic advice)
+4. A one-line CVSS vector rationale explaining why the given score fits
+
+Do not invent technical details not present in the raw finding. If evidence
+is thin, say so explicitly rather than filling gaps with assumptions.
+
+Raw finding:
+{finding_json}

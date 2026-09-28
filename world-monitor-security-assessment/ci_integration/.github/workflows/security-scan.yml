@@ -1,0 +1,40 @@
+name: Security Scan
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install scanner dependencies
+        run: pip install -r scanner/requirements.txt
+
+      # TODO: replace with actual steps to spin up the World Monitor app
+      # locally in the CI runner (e.g. docker compose up -d, then wait for
+      # a health check) before pointing the scanner at it.
+      - name: Start target app
+        run: echo "TODO: start World Monitor locally, e.g. docker compose up -d"
+
+      - name: Run security scanner
+        run: |
+          cd scanner
+          python main.py --target http://localhost:3000 --out findings.json
+
+      - name: Upload findings
+        uses: actions/upload-artifact@v4
+        with:
+          name: security-findings
+          path: scanner/findings.json
+
+      # TODO: optionally fail the build on new critical/high findings, e.g.
+      # by parsing findings.json and exiting non-zero.
