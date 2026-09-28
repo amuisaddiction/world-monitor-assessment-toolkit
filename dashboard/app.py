@@ -4,8 +4,14 @@ import json
 import time
 import os
 
-API_URL = os.getenv("API_BASE_URL", "http://127.0.0.1:8000")
-DEFAULT_TARGET = os.getenv("TARGET_URL", "http://127.0.0.1:8080")
+def get_config(key, default_val):
+    try:
+        return st.secrets[key]
+    except (KeyError, FileNotFoundError):
+        return os.environ.get(key, default_val)
+
+API_URL = get_config("API_BASE_URL", "http://127.0.0.1:8000")
+DEFAULT_TARGET = get_config("TARGET_URL", "http://127.0.0.1:8080")
 
 st.set_page_config(page_title="World Monitor SOC", page_icon="🛡️", layout="wide")
 
@@ -139,7 +145,7 @@ elif menu == "System Health":
         st.write("Demo Target: **OFFLINE**")
         
     # Check AI Triage
-    has_key = bool(os.getenv("GEMINI_API_KEY"))
+    has_key = bool(get_config("GEMINI_API_KEY", ""))
     st.write(f"AI Triage: **{'READY (Gemini)' if has_key else 'FALLBACK MODE'}**")
 
     st.markdown("---")
