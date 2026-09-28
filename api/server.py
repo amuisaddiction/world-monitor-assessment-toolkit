@@ -19,6 +19,13 @@ app.include_router(scans.router)
 app.include_router(findings.router)
 app.include_router(reports.router)
 
+@app.post("/api/reset")
+def reset_demo():
+    # Safely clear the database for a clean demonstration state
+    Base.metadata.drop_all(bind=engine)
+    Base.metadata.create_all(bind=engine)
+    return {"status": "success", "message": "Database reset"}
+
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="127.0.0.1", port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=8000)

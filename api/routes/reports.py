@@ -29,16 +29,10 @@ def generate_report(scan_id: str, db: Session = Depends(get_db)):
         
     os.makedirs("reports", exist_ok=True)
     report_path = f"reports/security_assessment_report_{scan_id}.md"
-    cert_path = f"reports/cert_in_compliance_mapping_{scan_id}.md"
-    
     run_report_generation(findings_list, report_path)
     
-    with open(cert_path, "w", encoding="utf-8") as f:
-        f.write("# Security practice / control mapping\\n\\nMapping generated successfully for CERT-In compliance constraints.\\n")
-    
-    rep1 = repository.save_report(db, scan_id, report_path, "Markdown")
-    rep2 = repository.save_report(db, scan_id, cert_path, "CERT-In Mapping")
-    return {"status": "success", "report_id": rep1.id, "file_path": report_path, "cert_path": cert_path}
+    rep = repository.save_report(db, scan_id, report_path)
+    return {"status": "success", "report_id": rep.id, "file_path": report_path}
 
 @router.get("/api/reports/{scan_id}")
 def get_reports(scan_id: str, db: Session = Depends(get_db)):
