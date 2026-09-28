@@ -1,0 +1,24 @@
+{
+  "application": "World Monitor Demo",
+  "authentication": {
+    "enabled": true,
+    "session_secure": false
+  },
+  "authorization": {
+    "admin_route_requires_role": true,
+    "broken_access_control_demo": true
+  },
+  "headers": {
+    "content_security_policy": false,
+    "x_content_type_options": true,
+    "strict_transport_security": false
+  },
+  "dependencies": [
+    {
+      "package": "requests",
+      "version": "2.20.0",
+      "vulnerable": true,
+      "cve": "CVE-2018-18074"
+    }
+  ]
+}
