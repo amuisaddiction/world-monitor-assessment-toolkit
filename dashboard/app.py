@@ -4,14 +4,8 @@ import json
 import time
 import os
 
-def get_config(key, default_val):
-    try:
-        return st.secrets[key]
-    except (KeyError, FileNotFoundError):
-        return os.environ.get(key, default_val)
-
-API_URL = get_config("API_BASE_URL", "http://127.0.0.1:8000")
-DEFAULT_TARGET = get_config("TARGET_URL", "http://127.0.0.1:8080")
+API_URL = os.getenv("API_BASE_URL", "http://127.0.0.1:8000")
+DEFAULT_TARGET = os.getenv("TARGET_URL", "http://127.0.0.1:8080")
 
 st.set_page_config(page_title="World Monitor SOC", page_icon="🛡️", layout="wide")
 
@@ -50,10 +44,10 @@ if menu == "Overview":
 
 elif menu == "New Assessment":
     st.header("New Assessment")
-    target = st.text_input("Authorized Target", DEFAULT_TARGET)
+    st.text_input("Authorized Target", "Internal Demo Target", disabled=True)
     if st.button("START SECURITY ASSESSMENT"):
         try:
-            res = requests.post(f"{API_URL}/api/scans", json={"target_url": target})
+            res = requests.post(f"{API_URL}/api/scans", json={"target_url": DEFAULT_TARGET})
             if res.status_code == 200:
                 st.success("Scan started successfully! Please wait...")
                 
@@ -137,13 +131,6 @@ elif menu == "System Health":
     st.write("Risk Engine: **ONLINE**")
     st.write("Report Engine: **ONLINE**")
     
-    # Check Demo Target
-    try:
-        target_res = requests.get(f"{DEFAULT_TARGET}/health", timeout=2)
-        st.write(f"Demo Target: **{'READY' if target_res.status_code == 200 else 'DEGRADED'}**")
-    except:
-        st.write("Demo Target: **OFFLINE**")
-        
     # Check AI Triage
     has_key = bool(get_config("GEMINI_API_KEY", ""))
     st.write(f"AI Triage: **{'READY (Gemini)' if has_key else 'FALLBACK MODE'}**")
