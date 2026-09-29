@@ -44,10 +44,10 @@ if menu == "Overview":
 
 elif menu == "New Assessment":
     st.header("New Assessment")
-    st.text_input("Authorized Target", "Internal Demo Target", disabled=True)
+    target = st.text_input("Authorized Target", DEFAULT_TARGET)
     if st.button("START SECURITY ASSESSMENT"):
         try:
-            res = requests.post(f"{API_URL}/api/scans", json={"target_url": DEFAULT_TARGET})
+            res = requests.post(f"{API_URL}/api/scans", json={"target_url": target})
             if res.status_code == 200:
                 st.success("Scan started successfully! Please wait...")
                 
@@ -131,8 +131,15 @@ elif menu == "System Health":
     st.write("Risk Engine: **ONLINE**")
     st.write("Report Engine: **ONLINE**")
     
+    # Check Demo Target
+    try:
+        target_res = requests.get(f"{DEFAULT_TARGET}/health", timeout=2)
+        st.write(f"Demo Target: **{'READY' if target_res.status_code == 200 else 'DEGRADED'}**")
+    except:
+        st.write("Demo Target: **OFFLINE**")
+        
     # Check AI Triage
-    has_key = bool(get_config("GEMINI_API_KEY", ""))
+    has_key = bool(os.getenv("GEMINI_API_KEY"))
     st.write(f"AI Triage: **{'READY (Gemini)' if has_key else 'FALLBACK MODE'}**")
 
     st.markdown("---")
