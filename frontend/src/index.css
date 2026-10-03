@@ -1,9 +1,13 @@
+@config "../tailwind.config.js";
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   body {
-    @apply bg-primaryBg text-textPrimary antialiased;
+    background-color: #0B1220;
+    color: #F8FAFC;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 }
